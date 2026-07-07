@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ficha de Inscrição — Acampamento DAM</title>
+<style>
+  :root{
+    --teal-900:#073b4c;
+    --teal-700:#0d6a7c;
+    --teal-500:#1a8fa3;
+    --sun-500:#f4a340;
+    --sun-600:#e08e2d;
+    --sand-50:#fffaf0;
+    --sand-100:#fdf3e0;
+    --ink:#0f2b33;
+    --muted:#5c7a82;
+    --error:#d64545;
+    --ok:#2a9d6f;
+    --radius:16px;
+    --shadow:0 10px 30px rgba(7,59,76,0.12);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:'Segoe UI',system-ui,-apple-system,Roboto,Helvetica,Arial,sans-serif;
+    background:
+      radial-gradient(1200px 600px at 10% -10%, #d7f1f5 0%, transparent 60%),
+      radial-gradient(1000px 500px at 110% 10%, #ffe9c7 0%, transparent 55%),
+      linear-gradient(180deg, var(--sand-50) 0%, var(--sand-100) 100%);
+    color:var(--ink);
+    min-height:100vh;
+    padding:24px 12px 60px;
+  }
+  .wrap{
+    max-width:720px;
+    margin:0 auto;
+  }
+  .hero{
+    text-align:center;
+    padding:28px 20px 22px;
+  }
+  .hero .badge{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    background:var(--teal-900);
+    color:#fff;
+    padding:6px 16px;
+    border-radius:999px;
+    font-size:12px;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    font-weight:600;
+  }
+  .hero h1{
+    font-size:clamp(24px,5vw,36px);
+    margin:14px 0 6px;
+    color:var(--teal-900);
+  }
+  .hero p{
+    margin:0;
+    color:var(--muted);
+    font-size:15px;
+  }
+  .wave{
+    font-size:20px;
+  }
+  form{
+    background:#fff;
+    border-radius:var(--radius);
+    box-shadow:var(--shadow);
+    padding:clamp(18px,4vw,36px);
+    border:1px solid rgba(7,59,76,0.06);
+  }
+  .section-title{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    font-size:13px;
+    font-weight:700;
+    text-transform:uppercase;
+    letter-spacing:.06em;
+    color:var(--teal-700);
+    margin:28px 0 14px;
+  }
+  .section-title:first-of-type{margin-top:4px;}
+  .section-title::before{
+    content:"";
+    width:8px;height:8px;border-radius:50%;
+    background:var(--sun-500);
+    flex:none;
+  }
+  .grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:16px;
+  }
+  .field{
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+    margin-bottom:16px;
+  }
+  .field.full{grid-column:1 / -1;}
+  label{
+    font-size:13px;
+    font-weight:600;
+    color:var(--teal-900);
+  }
+  label .opt{
+    font-weight:400;
+    color:var(--muted);
+  }
+  input[type=text],
+  input[type=date],
+  input[type=tel]{
+    border:1.5px solid #e1e8ea;
+    background:#fbfdfd;
+    border-radius:10px;
+    padding:12px 14px;
+    font-size:15px;
+    color:var(--ink);
+    outline:none;
+    transition:border-color .15s, box-shadow .15s;
+    width:100%;
+    font-family:inherit;
+  }
+  input:focus{
+    border-color:var(--teal-500);
+    box-shadow:0 0 0 4px rgba(26,143,163,0.12);
+  }
+  input.err{
+    border-color:var(--error);
+    box-shadow:0 0 0 4px rgba(214,69,69,0.10);
+  }
+  .error-msg{
+    font-size:12px;
+    color:var(--error);
+    min-height:14px;
+    display:none;
+  }
+  .error-msg.show{display:block;}
+  .radio-row{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+  }
+  .radio-pill{
+    position:relative;
+  }
+  .radio-pill input{
+    position:absolute;
+    opacity:0;
+    width:100%;height:100%;
+    top:0;left:0;
+    cursor:pointer;
+    margin:0;
+  }
+  .radio-pill span{
+    display:block;
+    padding:11px 22px;
+    border-radius:10px;
+    border:1.5px solid #e1e8ea;
+    background:#fbfdfd;
+    font-size:14px;
+    font-weight:600;
+    color:var(--muted);
+    transition:all .15s;
+    white-space:nowrap;
+  }
+  .radio-pill input:checked + span{
+    background:var(--teal-500);
+    border-color:var(--teal-500);
+    color:#fff;
+  }
+  .radio-pill.err span{
+    border-color:var(--error);
+  }
+  .info-card{
+    background:linear-gradient(135deg, #eaf7f4 0%, #fef6e6 100%);
+    border:1px solid rgba(7,59,76,0.08);
+    border-radius:12px;
+    padding:16px 18px;
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:14px;
+    margin-bottom:8px;
+  }
+  .info-item{
+    text-align:center;
+  }
+  .info-item .k{
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:.05em;
+    color:var(--muted);
+    font-weight:700;
+    margin-bottom:4px;
+  }
+  .info-item .v{
+    font-size:15px;
+    font-weight:700;
+    color:var(--teal-900);
+  }
+  .info-item .v.price{color:var(--sun-600);}
+  .actions{
+    margin-top:28px;
+  }
+  .btn-send{
+    width:100%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:10px;
+    background:linear-gradient(135deg,#25d366,#1ebe5b);
+    color:#fff;
+    border:none;
+    border-radius:12px;
+    padding:16px 18px;
+    font-size:16px;
+    font-weight:700;
+    cursor:pointer;
+    box-shadow:0 8px 20px rgba(37,211,102,0.35);
+    transition:transform .12s, box-shadow .12s;
+  }
+  .btn-send:hover{transform:translateY(-1px); box-shadow:0 10px 26px rgba(37,211,102,0.45);}
+  .btn-send:active{transform:translateY(0);}
+  .btn-send svg{flex:none;}
+  .form-note{
+    text-align:center;
+    font-size:12px;
+    color:var(--muted);
+    margin-top:12px;
+  }
+  .banner{
+    display:none;
+    align-items:center;
+    gap:8px;
+    background:#fdecec;
+    border:1px solid #f3b9b9;
+    color:var(--error);
+    padding:12px 14px;
+    border-radius:10px;
+    font-size:13px;
+    font-weight:600;
+    margin-bottom:18px;
+  }
+  .banner.show{display:flex;}
+  footer{
+    text-align:center;
+    color:var(--muted);
+    font-size:12px;
+    margin-top:26px;
+  }
+  @media (max-width:560px){
+    .grid{grid-template-columns:1fr;}
+    .info-card{grid-template-columns:1fr;}
+    .field.full{grid-column:auto;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="hero">
+    <span class="badge">Inscrição Oficial</span>
+    <h1>🏕️ Acampamento DAM <span class="wave">🌊</span></h1>
+    <p>Preencha seus dados para garantir sua vaga na Praia das Gaivotas</p>
+    <p id="prazoAviso" style="margin-top:10px;font-size:13px;font-weight:700;color:#e08e2d;"></p>
+  </div>
+
+  <div id="encerrado" style="display:none;background:#fff;border-radius:16px;box-shadow:0 10px 30px rgba(7,59,76,0.12);padding:40px 24px;text-align:center;">
+    <div style="font-size:42px;margin-bottom:12px;">⏳</div>
+    <h2 style="color:#073b4c;margin:0 0 10px;">Inscrições encerradas</h2>
+    <p style="color:#5c7a82;margin:0;">O prazo para inscrição no Acampamento DAM — Praia das Gaivotas foi finalizado.<br>Em caso de dúvidas, entre em contato pelo WhatsApp.</p>
+  </div>
+
+  <form id="inscricaoForm" novalidate>
+
+    <div id="banner" class="banner">⚠️ Corrija os campos destacados antes de enviar.</div>
+
+    <div class="section-title">Dados pessoais</div>
+
+    <div class="field full">
+      <label for="nome">Nome completo</label>
+      <input type="text" id="nome" autocomplete="name" placeholder="Ex: Maria da Silva Souza">
+      <span class="error-msg" id="err-nome">Informe o nome completo.</span>
+    </div>
+
+    <div class="grid">
+      <div class="field">
+        <label>Sexo</label>
+        <div class="radio-row" id="sexoGroup">
+          <label class="radio-pill">
+            <input type="radio" name="sexo" value="Masculino">
+            <span>Masculino</span>
+          </label>
+          <label class="radio-pill">
+            <input type="radio" name="sexo" value="Feminino">
+            <span>Feminino</span>
+          </label>
+        </div>
+        <span class="error-msg" id="err-sexo">Selecione uma opção.</span>
+      </div>
+
+      <div class="field">
+        <label for="nascimento">Data de nascimento</label>
+        <input type="date" id="nascimento">
+        <span class="error-msg" id="err-nascimento">Informe uma data válida.</span>
+      </div>
+    </div>
+
+    <div class="grid">
+      <div class="field">
+        <label for="rg">RG</label>
+        <input type="text" id="rg" inputmode="numeric" placeholder="00.000.000-0" maxlength="12">
+        <span class="error-msg" id="err-rg">Informe um RG válido.</span>
+      </div>
+
+      <div class="field">
+        <label for="cpf">CPF</label>
+        <input type="text" id="cpf" inputmode="numeric" placeholder="000.000.000-00" maxlength="14">
+        <span class="error-msg" id="err-cpf">Informe um CPF válido.</span>
+      </div>
+    </div>
+
+    <div class="section-title">Endereço e contato</div>
+
+    <div class="field full">
+      <label for="endereco">Endereço completo</label>
+      <input type="text" id="endereco" autocomplete="street-address" placeholder="Rua, número, bairro, cidade - UF">
+      <span class="error-msg" id="err-endereco">Informe o endereço completo.</span>
+    </div>
+
+    <div class="field full">
+      <label for="celular">Celular para contato</label>
+      <input type="tel" id="celular" inputmode="numeric" placeholder="(00) 00000-0000" maxlength="15">
+      <span class="error-msg" id="err-celular">Informe um celular válido com DDD.</span>
+    </div>
+
+    <div class="section-title">Dados da atividade</div>
+
+    <div class="info-card">
+      <div class="info-item">
+        <div class="k">Atividade</div>
+        <div class="v">Camping</div>
+      </div>
+      <div class="info-item">
+        <div class="k">Local pretendido</div>
+        <div class="v">Praia das Gaivotas</div>
+      </div>
+      <div class="info-item">
+        <div class="k">Taxa de inscrição</div>
+        <div class="v price">R$ 250,00</div>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button type="submit" class="btn-send" id="btnEnviar">
+        <svg width="22" height="22" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M16.001 2.667c-7.364 0-13.334 5.97-13.334 13.333 0 2.353.615 4.646 1.782 6.666L2.667 29.333l6.84-1.793a13.27 13.27 0 0 0 6.494 1.693h.006c7.363 0 13.333-5.97 13.333-13.333S23.364 2.667 16.001 2.667Z" fill="#fff" fill-opacity=".15"/>
+          <path d="M16.001 2.667c-7.364 0-13.334 5.97-13.334 13.333 0 2.353.615 4.646 1.782 6.666L2.667 29.333l6.84-1.793a13.27 13.27 0 0 0 6.494 1.693h.006c7.363 0 13.333-5.97 13.333-13.333S23.364 2.667 16.001 2.667Zm0 24.4h-.005a11.05 11.05 0 0 1-5.633-1.541l-.404-.24-4.06 1.065 1.084-3.958-.263-.406a11.06 11.06 0 0 1-1.696-5.887c0-6.11 4.972-11.081 11.083-11.081 2.96 0 5.742 1.154 7.834 3.248a11.006 11.006 0 0 1 3.245 7.84c-.002 6.11-4.974 11.08-11.086 11.08l.001-.12Z" fill="#fff"/>
+          <path d="M22.223 18.63c-.34-.17-2.008-.99-2.319-1.104-.311-.113-.537-.17-.763.17-.226.34-.876 1.104-1.074 1.33-.198.226-.396.254-.735.084-.34-.17-1.434-.528-2.732-1.684-1.01-.9-1.692-2.012-1.89-2.352-.198-.34-.021-.523.149-.693.153-.152.34-.396.51-.594.17-.198.226-.34.34-.566.113-.226.056-.424-.028-.594-.085-.17-.764-1.84-1.047-2.52-.276-.663-.556-.573-.764-.583-.198-.01-.424-.012-.65-.012s-.594.085-.905.424c-.311.34-1.187 1.16-1.187 2.83s1.215 3.283 1.384 3.51c.17.226 2.393 3.655 5.798 5.126.81.35 1.442.559 1.935.716.813.259 1.552.222 2.137.135.652-.097 2.008-.82 2.29-1.612.283-.792.283-1.472.198-1.613-.085-.14-.31-.226-.65-.396Z" fill="#fff"/>
+        </svg>
+        Enviar inscrição via WhatsApp
+      </button>
+      <div class="form-note">Ao enviar, o WhatsApp abrirá com seus dados prontos para envio ao organizador.</div>
+    </div>
+  </form>
+
+  <footer>Acampamento DAM · Praia das Gaivotas · Taxa de inscrição R$ 250,00</footer>
+</div>
+
+<script>
+const WHATSAPP_NUMBER = "5566981289787";
+const PRAZO_LIMITE = new Date('2026-07-11T23:59:59');
+
+(function checkPrazo(){
+  const agora = new Date();
+  const aviso = document.getElementById('prazoAviso');
+  if(agora > PRAZO_LIMITE){
+    document.getElementById('inscricaoForm').style.display = 'none';
+    document.getElementById('encerrado').style.display = 'block';
+    if(aviso) aviso.textContent = '';
+  } else if(aviso){
+    const dd = String(PRAZO_LIMITE.getDate()).padStart(2,'0');
+    const mm = String(PRAZO_LIMITE.getMonth()+1).padStart(2,'0');
+    const yyyy = PRAZO_LIMITE.getFullYear();
+    aviso.textContent = `⏳ Inscrições abertas até ${dd}/${mm}/${yyyy} às 23:59`;
+  }
+})();
+
+const nomeEl = document.getElementById('nome');
+const nascimentoEl = document.getElementById('nascimento');
+const rgEl = document.getElementById('rg');
+const cpfEl = document.getElementById('cpf');
+const enderecoEl = document.getElementById('endereco');
+const celularEl = document.getElementById('celular');
+const sexoGroup = document.getElementById('sexoGroup');
+const banner = document.getElementById('banner');
+
+function onlyDigits(v){ return v.replace(/\D/g,''); }
+
+rgEl.addEventListener('input', () => {
+  let d = onlyDigits(rgEl.value).slice(0,9);
+  let out = d;
+  if(d.length > 2) out = d.slice(0,2)+'.'+d.slice(2);
+  if(d.length > 5) out = d.slice(0,2)+'.'+d.slice(2,5)+'.'+d.slice(5,8)+(d.length>8 ? '-'+d.slice(8):'');
+  rgEl.value = out;
+});
+
+cpfEl.addEventListener('input', () => {
+  let d = onlyDigits(cpfEl.value).slice(0,11);
+  let out = d;
+  if(d.length > 3) out = d.slice(0,3)+'.'+d.slice(3);
+  if(d.length > 6) out = d.slice(0,3)+'.'+d.slice(3,6)+'.'+d.slice(6,9);
+  if(d.length > 9) out = d.slice(0,3)+'.'+d.slice(3,6)+'.'+d.slice(6,9)+'-'+d.slice(9,11);
+  cpfEl.value = out;
+});
+
+celularEl.addEventListener('input', () => {
+  let d = onlyDigits(celularEl.value).slice(0,11);
+  let out = d;
+  if(d.length > 0) out = '('+d.slice(0,2);
+  if(d.length > 2) out += ') '+d.slice(2, d.length > 10 ? 7 : 6);
+  if(d.length > 6) out += '-'+ (d.length > 10 ? d.slice(7,11) : d.slice(6,10));
+  celularEl.value = out;
+});
+
+function validCPF(cpfRaw){
+  const cpf = onlyDigits(cpfRaw);
+  if(cpf.length !== 11) return false;
+  if(/^(\d)\1{10}$/.test(cpf)) return false;
+  let sum = 0;
+  for(let i=0;i<9;i++) sum += parseInt(cpf[i]) * (10 - i);
+  let rev = 11 - (sum % 11);
+  if(rev >= 10) rev = 0;
+  if(rev !== parseInt(cpf[9])) return false;
+  sum = 0;
+  for(let i=0;i<10;i++) sum += parseInt(cpf[i]) * (11 - i);
+  rev = 11 - (sum % 11);
+  if(rev >= 10) rev = 0;
+  if(rev !== parseInt(cpf[10])) return false;
+  return true;
+}
+
+function setError(inputEl, errId, hasError){
+  const errEl = document.getElementById(errId);
+  if(hasError){
+    inputEl.classList.add('err');
+    errEl.classList.add('show');
+  } else {
+    inputEl.classList.remove('err');
+    errEl.classList.remove('show');
+  }
+}
+
+function setGroupError(hasError){
+  const errEl = document.getElementById('err-sexo');
+  const pills = sexoGroup.querySelectorAll('.radio-pill');
+  if(hasError){
+    pills.forEach(p => p.classList.add('err'));
+    errEl.classList.add('show');
+  } else {
+    pills.forEach(p => p.classList.remove('err'));
+    errEl.classList.remove('show');
+  }
+}
+
+function validate(){
+  let ok = true;
+
+  const nomeVal = nomeEl.value.trim();
+  const nomeOk = nomeVal.length >= 5 && nomeVal.split(/\s+/).length >= 2;
+  setError(nomeEl, 'err-nome', !nomeOk);
+  ok = ok && nomeOk;
+
+  const sexoVal = document.querySelector('input[name="sexo"]:checked');
+  setGroupError(!sexoVal);
+  ok = ok && !!sexoVal;
+
+  let nascOk = false;
+  if(nascimentoEl.value){
+    const d = new Date(nascimentoEl.value + 'T00:00:00');
+    const today = new Date();
+    nascOk = d < today && d.getFullYear() > 1900;
+  }
+  setError(nascimentoEl, 'err-nascimento', !nascOk);
+  ok = ok && nascOk;
+
+  const rgDigits = onlyDigits(rgEl.value);
+  const rgOk = rgDigits.length >= 7 && rgDigits.length <= 9;
+  setError(rgEl, 'err-rg', !rgOk);
+  ok = ok && rgOk;
+
+  const cpfOk = validCPF(cpfEl.value);
+  setError(cpfEl, 'err-cpf', !cpfOk);
+  ok = ok && cpfOk;
+
+  const enderecoOk = enderecoEl.value.trim().length >= 8;
+  setError(enderecoEl, 'err-endereco', !enderecoOk);
+  ok = ok && enderecoOk;
+
+  const celDigits = onlyDigits(celularEl.value);
+  const celOk = celDigits.length === 10 || celDigits.length === 11;
+  setError(celularEl, 'err-celular', !celOk);
+  ok = ok && celOk;
+
+  return ok;
+}
+
+[nomeEl, nascimentoEl, rgEl, cpfEl, enderecoEl, celularEl].forEach(el => {
+  el.addEventListener('blur', validate);
+});
+sexoGroup.querySelectorAll('input[name="sexo"]').forEach(r => {
+  r.addEventListener('change', validate);
+});
+
+function formatDateBR(iso){
+  const [y,m,d] = iso.split('-');
+  return `${d}/${m}/${y}`;
+}
+
+document.getElementById('inscricaoForm').addEventListener('submit', function(e){
+  e.preventDefault();
+
+  const isValid = validate();
+
+  if(!isValid){
+    banner.classList.add('show');
+    const firstError = document.querySelector('.err, .error-msg.show');
+    if(firstError) firstError.scrollIntoView({behavior:'smooth', block:'center'});
+    return;
+  }
+
+  banner.classList.remove('show');
+
+  const nome = nomeEl.value.trim();
+  const sexo = document.querySelector('input[name="sexo"]:checked').value;
+  const nascimento = formatDateBR(nascimentoEl.value);
+  const rg = rgEl.value.trim();
+  const cpf = cpfEl.value.trim();
+  const endereco = enderecoEl.value.trim();
+  const celular = celularEl.value.trim();
+
+  const mensagem =
+`*FICHA DE INSCRIÇÃO - ACAMPAMENTO DAM*
+
+*Nome completo:* ${nome}
+*Sexo:* ${sexo}
+*Data de nascimento:* ${nascimento}
+*RG:* ${rg}
+*CPF:* ${cpf}
+*Endereço:* ${endereco}
+*Celular:* ${celular}
+
+*Atividade:* Camping
+*Local pretendido:* Praia das Gaivotas
+*Taxa de inscrição:* R$ 250,00`;
+
+  const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(mensagem)}`;
+  window.open(url, '_blank');
+});
+</script>
+</body>
+</html>
