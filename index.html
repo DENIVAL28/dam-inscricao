@@ -339,6 +339,33 @@
       <span class="error-msg" id="err-celular">Informe um celular válido com DDD.</span>
     </div>
 
+    <div class="section-title">Pessoa jurídica <span style="text-transform:none;font-weight:400;color:var(--muted);">(opcional)</span></div>
+
+    <div class="field full" style="flex-direction:row;align-items:center;gap:10px;margin-bottom:18px;">
+      <input type="checkbox" id="pjToggle" style="width:18px;height:18px;accent-color:var(--teal-500);margin:0;">
+      <label for="pjToggle" style="margin:0;">Inscrição também em nome de uma Pessoa Jurídica (CNPJ)</label>
+    </div>
+
+    <div id="pjFields" style="display:none;">
+      <div class="grid">
+        <div class="field">
+          <label for="cnpj">CNPJ</label>
+          <input type="text" id="cnpj" inputmode="numeric" placeholder="00.000.000/0000-00" maxlength="18">
+          <span class="error-msg" id="err-cnpj">Informe um CNPJ válido.</span>
+        </div>
+        <div class="field">
+          <label for="razaoSocial">Razão social</label>
+          <input type="text" id="razaoSocial" placeholder="Nome da empresa">
+          <span class="error-msg" id="err-razaoSocial">Informe a razão social.</span>
+        </div>
+      </div>
+      <div class="field full">
+        <label for="enderecoPJ">Endereço da empresa</label>
+        <input type="text" id="enderecoPJ" placeholder="Rua, número, bairro, cidade - UF">
+        <span class="error-msg" id="err-enderecoPJ">Informe o endereço da empresa.</span>
+      </div>
+    </div>
+
     <div class="section-title">Dados da atividade</div>
 
     <div class="info-card">
@@ -400,6 +427,19 @@ const celularEl = document.getElementById('celular');
 const sexoGroup = document.getElementById('sexoGroup');
 const banner = document.getElementById('banner');
 
+const pjToggle = document.getElementById('pjToggle');
+const pjFields = document.getElementById('pjFields');
+const cnpjEl = document.getElementById('cnpj');
+const razaoSocialEl = document.getElementById('razaoSocial');
+const enderecoPJEl = document.getElementById('enderecoPJ');
+
+pjToggle.addEventListener('change', () => {
+  pjFields.style.display = pjToggle.checked ? 'block' : 'none';
+  if(!pjToggle.checked){
+    [cnpjEl, razaoSocialEl, enderecoPJEl].forEach(el => setError(el, 'err-'+el.id, false));
+  }
+});
+
 function onlyDigits(v){ return v.replace(/\D/g,''); }
 
 rgEl.addEventListener('input', () => {
@@ -417,6 +457,16 @@ cpfEl.addEventListener('input', () => {
   if(d.length > 6) out = d.slice(0,3)+'.'+d.slice(3,6)+'.'+d.slice(6,9);
   if(d.length > 9) out = d.slice(0,3)+'.'+d.slice(3,6)+'.'+d.slice(6,9)+'-'+d.slice(9,11);
   cpfEl.value = out;
+});
+
+cnpjEl.addEventListener('input', () => {
+  let d = onlyDigits(cnpjEl.value).slice(0,14);
+  let out = d;
+  if(d.length > 2) out = d.slice(0,2)+'.'+d.slice(2);
+  if(d.length > 5) out = d.slice(0,2)+'.'+d.slice(2,5)+'.'+d.slice(5);
+  if(d.length > 8) out = d.slice(0,2)+'.'+d.slice(2,5)+'.'+d.slice(5,8)+'/'+d.slice(8);
+  if(d.length > 12) out = d.slice(0,2)+'.'+d.slice(2,5)+'.'+d.slice(5,8)+'/'+d.slice(8,12)+'-'+d.slice(12,14);
+  cnpjEl.value = out;
 });
 
 celularEl.addEventListener('input', () => {
@@ -442,6 +492,24 @@ function validCPF(cpfRaw){
   rev = 11 - (sum % 11);
   if(rev >= 10) rev = 0;
   if(rev !== parseInt(cpf[10])) return false;
+  return true;
+}
+
+function validCNPJ(cnpjRaw){
+  const cnpj = onlyDigits(cnpjRaw);
+  if(cnpj.length !== 14) return false;
+  if(/^(\d)\1{13}$/.test(cnpj)) return false;
+  const calc = (base) => {
+    let pesos = base.length === 12 ? [5,4,3,2,9,8,7,6,5,4,3,2] : [6,5,4,3,2,9,8,7,6,5,4,3,2];
+    let sum = 0;
+    for(let i=0;i<base.length;i++) sum += parseInt(base[i]) * pesos[i];
+    const rest = sum % 11;
+    return rest < 2 ? 0 : 11 - rest;
+  };
+  const dv1 = calc(cnpj.slice(0,12));
+  if(dv1 !== parseInt(cnpj[12])) return false;
+  const dv2 = calc(cnpj.slice(0,13));
+  if(dv2 !== parseInt(cnpj[13])) return false;
   return true;
 }
 
@@ -507,10 +575,24 @@ function validate(){
   setError(celularEl, 'err-celular', !celOk);
   ok = ok && celOk;
 
+  if(pjToggle.checked){
+    const cnpjOk = validCNPJ(cnpjEl.value);
+    setError(cnpjEl, 'err-cnpj', !cnpjOk);
+    ok = ok && cnpjOk;
+
+    const razaoOk = razaoSocialEl.value.trim().length >= 3;
+    setError(razaoSocialEl, 'err-razaoSocial', !razaoOk);
+    ok = ok && razaoOk;
+
+    const enderecoPJOk = enderecoPJEl.value.trim().length >= 8;
+    setError(enderecoPJEl, 'err-enderecoPJ', !enderecoPJOk);
+    ok = ok && enderecoPJOk;
+  }
+
   return ok;
 }
 
-[nomeEl, nascimentoEl, rgEl, cpfEl, enderecoEl, celularEl].forEach(el => {
+[nomeEl, nascimentoEl, rgEl, cpfEl, enderecoEl, celularEl, cnpjEl, razaoSocialEl, enderecoPJEl].forEach(el => {
   el.addEventListener('blur', validate);
 });
 sexoGroup.querySelectorAll('input[name="sexo"]').forEach(r => {
@@ -544,7 +626,7 @@ document.getElementById('inscricaoForm').addEventListener('submit', function(e){
   const endereco = enderecoEl.value.trim();
   const celular = celularEl.value.trim();
 
-  const mensagem =
+  let mensagem =
 `*FICHA DE INSCRIÇÃO - ACAMPAMENTO DAM*
 
 *Nome completo:* ${nome}
@@ -553,7 +635,18 @@ document.getElementById('inscricaoForm').addEventListener('submit', function(e){
 *RG:* ${rg}
 *CPF:* ${cpf}
 *Endereço:* ${endereco}
-*Celular:* ${celular}
+*Celular:* ${celular}`;
+
+  if(pjToggle.checked){
+    mensagem += `
+
+*--- Pessoa Jurídica ---*
+*CNPJ:* ${cnpjEl.value.trim()}
+*Razão social:* ${razaoSocialEl.value.trim()}
+*Endereço da empresa:* ${enderecoPJEl.value.trim()}`;
+  }
+
+  mensagem += `
 
 *Atividade:* Camping
 *Local pretendido:* Praia das Gaivotas
